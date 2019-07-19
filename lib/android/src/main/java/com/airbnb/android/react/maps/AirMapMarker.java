@@ -5,12 +5,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.view.View;
-import android.view.ViewParent;
 import android.widget.LinearLayout;
 import android.animation.ObjectAnimator;
 import android.util.Property;
@@ -283,17 +281,21 @@ public class AirMapMarker extends AirMapFeature {
     if (!tracksViewChangesActive)
       return false;
 
-    if (hasViewChanges)
-      updateMarkerIcon();
+    updateMarkerIcon();
 
     return true;
   }
 
   public void updateMarkerIcon() {
-//    Log.i("AirMapMarker", "updateMarkerIcon");
     if (marker == null) return;
-    marker.setIcon(getIcon());
-    hasViewChanges = false;
+
+    if (!hasCustomMarkerView) {
+      // No more updates for this, as it's a simple icon
+      hasViewChanges = false;
+    }
+    if (marker != null) {
+      marker.setIcon(getIcon());
+    }
   }
 
   public LatLng interpolate(float fraction, LatLng a, LatLng b) {
@@ -428,20 +430,6 @@ public class AirMapMarker extends AirMapFeature {
       }
 
     }
-  }
-
-  @Override
-  public void onDescendantInvalidated(View child, View target) {
-//    Log.i("AirMapMarker", "onDescendantInvalidated");
-    hasViewChanges = true;
-    super.onDescendantInvalidated(child, target);
-  }
-
-  @Override
-  public ViewParent invalidateChildInParent(int[] location, Rect dirty) {
-//    Log.i("AirMapMarker", "invalidateChildInParent");
-    hasViewChanges = true;
-    return super.invalidateChildInParent(location, dirty);
   }
 
   @Override
